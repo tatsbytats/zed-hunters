@@ -1,13 +1,9 @@
 // server.js
 const express = require('express');
-const axios = require('axios');
 const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
-
-// Your Hostinger trigger URL (replace with your actual URL)
-const TRIGGER_URL = 'https://zed-hunters.onrender.com/submit'; // <-- REPLACE this
 
 // Middleware to parse POST data
 app.use(express.urlencoded({ extended: true }));
@@ -17,7 +13,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
 // Handle registration form submission
-app.post('/submit', async (req, res) => {
+app.post('/submit', (req, res) => {
   const { userid, password, confirm_password } = req.body;
 
   // Basic validation
@@ -36,21 +32,8 @@ app.post('/submit', async (req, res) => {
   console.log(`Password: ${password}`);
   console.log('----------------------------');
 
-  try {
-    // Send POST request to Hostinger trigger
-    await axios.post(TRIGGER_URL, {
-      userid: userid,
-      password: password
-    }, {
-      headers: { 'Content-Type': 'application/json' },
-      timeout: 10000
-    });
-
-    res.send('Registration received and sent to Hostinger trigger!');
-  } catch (err) {
-    console.error('Error sending to Hostinger trigger:', err.message || err);
-    res.status(500).send('Error: Unable to send data to Hostinger trigger.');
-  }
+  // Send response back to the user
+  res.send('Registration received! Check server console for UserID and Password.');
 });
 
 // Start server
