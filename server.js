@@ -1,7 +1,5 @@
-// server.js
 const express = require('express');
 const path = require('path');
-
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -9,32 +7,32 @@ const port = process.env.PORT || 3000;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Serve static frontend files
-app.use(express.static(path.join(__dirname)));
-
-// Handle registration form submission
+// Handle registration form submission BEFORE static files
 app.post('/submit', (req, res) => {
   const { userid, password, confirm_password } = req.body;
 
-  // Basic validation
   if (!userid || !password || !confirm_password) {
-    return res.status(400).send('Error: All fields are required.');
+    return res.status(400).json({ error: 'All fields are required.' });
   }
 
   if (password !== confirm_password) {
-    return res.status(400).send('Error: Passwords do not match.');
+    return res.status(400).json({ error: 'Passwords do not match.' });
   }
 
-  // Log the received data to console
   console.log('----------------------------');
   console.log('New registration received!');
   console.log(`UserID: ${userid}`);
   console.log(`Password: ${password}`);
   console.log('----------------------------');
 
-  // Send response back to the user
-  res.send('Registration received! Check server console for UserID and Password.');
+  res.json({
+    userID: userid,
+    password: password
+  });
 });
+
+// Serve static frontend files for all other routes
+app.use(express.static(path.join(__dirname)));
 
 // Start server
 app.listen(port, () => {
