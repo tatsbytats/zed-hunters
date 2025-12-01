@@ -1,22 +1,45 @@
+// server.js
+const express = require('express');
+const path = require('path');
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Middleware to parse POST data
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// Serve static frontend files (index.html, styles.css, script.js)
+app.use(express.static(path.join(__dirname)));
+
+// Handle registration form submission
 app.post('/submit', (req, res) => {
   const { userid, password, confirm_password } = req.body;
 
+  // Basic validation
   if (!userid || !password || !confirm_password) {
-    return res.status(400).send('Error: All fields are required.');
+    return res.status(400).json({ error: 'All fields are required.' });
   }
 
   if (password !== confirm_password) {
-    return res.status(400).send('Error: Passwords do not match.');
+    return res.status(400).json({ error: 'Passwords do not match.' });
   }
 
-  // Log for debugging
-  console.log('Received from registration form:');
+  // Log data for debugging
+  console.log('----------------------------');
+  console.log('New registration received!');
   console.log(`UserID: ${userid}`);
   console.log(`Password: ${password}`);
+  console.log('----------------------------');
 
-  // Respond with JSON containing variables for Hostinger
+  // Respond with JSON containing the variables Hostinger can use
   res.json({
-    userID: userid,
-    password: password
+    userID: userid,     // {@userID} in Hostinger
+    password: password  // {@password} in Hostinger
   });
+});
+
+// Start server
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
 });
